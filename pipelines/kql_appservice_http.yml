@@ -1,0 +1,22 @@
+name: Web server fields in the Azure App Service AppServiceHTTPLogs table
+priority: 20
+transformations:
+  - id: appservice_http_fields
+    type: field_name_mapping
+    mapping:
+      c-ip: CIp
+      cs-username: CsUsername
+      cs-method: CsMethod
+      cs-uri-stem: CsUriStem
+      cs-uri-query: CsUriQuery
+      sc-status: ScStatus
+    rule_conditions:
+      - type: logsource
+        category: webserver
+  - id: appservice_http_table
+    type: set_state
+    key: query_table
+    val: AppServiceHTTPLogs
+    rule_conditions:
+      - type: logsource
+        category: webserver

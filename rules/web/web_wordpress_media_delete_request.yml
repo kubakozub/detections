@@ -1,0 +1,53 @@
+title: WordPress Media Deleted Through A Logged Request
+id: 3341ea50-e178-4f3c-9f5c-0985db497982
+name: wordpress_media_delete_request
+status: experimental
+description: |
+    A media item deleted through an endpoint whose request line names the attachment: the REST route
+    DELETE /wp/v2/media/<id> (also when tunnelled through POST with _method=DELETE), or the classic
+    admin delete links in post.php and upload.php. Deleting an attachment runs
+    wp_delete_attachment_files(), the sink of HackerOne #3931777. On its own this is ordinary site
+    administration; the rule exists as the second half of the finalize-then-delete correlation.
+    Blind spots - deletes from the grid-mode media library go through admin-ajax.php with the id in
+    the body, and a method override sent in the X-HTTP-Method-Override header is not in the request
+    line. Neither reaches a standard access log.
+references:
+    - https://hackerone.com/reports/3931777
+    - https://core.trac.wordpress.org/changeset/63200
+    - https://jakubkozub.com/research/wordpress-media-finalize/
+author: Jakub Kozub
+date: 2026-10-23
+tags:
+    - attack.impact
+    - attack.t1485
+logsource:
+    category: webserver
+detection:
+    selection_rest_method:
+        cs-method: 'DELETE'
+    selection_rest_override:
+        cs-method: 'POST'
+        cs-uri-query|contains: '_method=DELETE'
+    selection_rest_route_pretty:
+        cs-uri-stem|contains: '/wp/v2/media/'
+    selection_rest_route_plain:
+        cs-uri-query|contains:
+            - 'rest_route=/wp/v2/media/'
+            - 'rest_route=%2Fwp%2Fv2%2Fmedia%2F'
+    selection_rest_ok:
+        sc-status: 200
+    selection_admin_link:
+        cs-uri-stem|endswith:
+            - '/wp-admin/post.php'
+            - '/wp-admin/upload.php'
+        cs-uri-query|contains: 'action=delete'
+    selection_admin_ok:
+        # both screens answer a successful delete with a redirect back to the media library
+        sc-status: 302
+    condition: >
+        ((selection_rest_method or selection_rest_override)
+        and (selection_rest_route_pretty or selection_rest_route_plain) and selection_rest_ok)
+        or (selection_admin_link and selection_admin_ok)
+falsepositives:
+    - Editors and administrators deleting media. The rule is informational and meant to feed the correlation.
+level: informational

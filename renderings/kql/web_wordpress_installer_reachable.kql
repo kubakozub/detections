@@ -1,0 +1,2 @@
+AppServiceHTTPLogs
+| where CsUriStem endswith "/wp-admin/setup-config.php" and ScStatus == 200

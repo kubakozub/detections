@@ -1,0 +1,6 @@
+sigma-cli==3.1.0
+pySigma==1.5.1
+pySigma-backend-sqlite==2.0.0
+pySigma-backend-splunk==2.1.0
+pySigma-backend-elasticsearch==2.1.1
+pySigma-backend-kusto==1.0.1

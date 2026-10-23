@@ -1,0 +1,34 @@
+name: Web server and Linux file-delete fields in Elastic Common Schema
+priority: 20
+transformations:
+  - id: ecs_web_fields
+    type: field_name_mapping
+    mapping:
+      c-ip: source.ip
+      cs-username: user.name
+      cs-method: http.request.method
+      cs-uri-stem: url.path
+      cs-uri-query: url.query
+      sc-status: http.response.status_code
+    rule_conditions:
+      - type: logsource
+        category: webserver
+  - id: ecs_file_delete_fields
+    type: field_name_mapping
+    mapping:
+      TargetFilename: file.path
+      Image: process.executable
+      User: user.name
+    rule_conditions:
+      - type: logsource
+        category: file_delete
+        product: linux
+  - id: ecs_file_delete_event
+    type: add_condition
+    conditions:
+      event.category: file
+      event.type: deletion
+    rule_conditions:
+      - type: logsource
+        category: file_delete
+        product: linux

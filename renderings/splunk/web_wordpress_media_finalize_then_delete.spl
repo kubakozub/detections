@@ -1,0 +1,8 @@
+| multisearch
+[ search method="POST" status=200 (uri_path="*/wp/v2/media/*" uri_path IN ("*/finalize", "*/finalize/")) OR (uri_query IN ("*rest_route=/wp/v2/media/*", "*rest_route=%2Fwp%2Fv2%2Fmedia%2F*") uri_query IN ("*/finalize*", "*%2Ffinalize*")) | eval event_type="wordpress_media_finalize_request" ]
+[ search (method="DELETE" OR (method="POST" uri_query="*_method=DELETE*") uri_path="*/wp/v2/media/*" OR uri_query IN ("*rest_route=/wp/v2/media/*", "*rest_route=%2Fwp%2Fv2%2Fmedia%2F*") status=200) OR (uri_path IN ("*/wp-admin/post.php", "*/wp-admin/upload.php") uri_query="*action=delete*" status=302) | eval event_type="wordpress_media_delete_request" ]
+
+| bin _time span=15m
+| stats dc(event_type) as event_type_count by _time clientip
+
+| search event_type_count >= 2

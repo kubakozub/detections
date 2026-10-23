@@ -1,0 +1,11 @@
+name: Keep only deletions in Defender XDR DeviceFileEvents
+priority: 30
+transformations:
+  - id: xdr_file_deleted_only
+    type: add_condition
+    conditions:
+      ActionType: FileDeleted
+    rule_conditions:
+      - type: logsource
+        category: file_delete
+        product: linux

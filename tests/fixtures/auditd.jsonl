@@ -1,0 +1,5 @@
+{"id": "audit-delete-traversal", "timestamp": "2026-08-11 11:20:15", "type": "PATH", "item": 1, "name": "/var/www/html/wp-content/uploads/2026/08/../../../../wp-config.php", "nametype": "DELETE", "expect": ["lnx_auditd_wordpress_wp_config_deleted"], "note": "PATH record of the unlink, path as the PHP worker passed it"}
+{"id": "audit-parent", "timestamp": "2026-08-11 11:20:15", "type": "PATH", "item": 0, "name": "/var/www/html/wp-content/uploads/2026/08/../../../../", "nametype": "PARENT", "expect": [], "note": "PARENT record of the same syscall"}
+{"id": "audit-syscall", "timestamp": "2026-08-11 11:20:15", "type": "SYSCALL", "syscall": "unlinkat", "exe": "/usr/sbin/php-fpm8.2", "key": "wp_config", "expect": [], "note": "SYSCALL record of the same event"}
+{"id": "audit-create", "timestamp": "2026-08-11 13:00:00", "type": "PATH", "item": 1, "name": "/var/www/html/wp-config.php", "nametype": "CREATE", "expect": [], "note": "a deployment writing the file"}
+{"id": "audit-delete-sample", "timestamp": "2026-08-11 13:05:00", "type": "PATH", "item": 1, "name": "/var/www/html/wp-config-sample.php", "nametype": "DELETE", "expect": [], "note": "a different file"}

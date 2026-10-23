@@ -1,0 +1,2 @@
+DeviceFileEvents
+| where ActionType =~ "FileDeleted" and FolderPath endswith "/wp-config.php"

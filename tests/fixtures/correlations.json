@@ -1,0 +1,8 @@
+{
+  "web_wordpress_media_finalize_then_delete": [
+    {"group": {"c-ip": "203.0.113.10"}, "events": ["chain-delete", "chain-finalize"]},
+    {"group": {"c-ip": "203.0.113.20"}, "events": ["plain-delete-override", "plain-finalize"]},
+    {"group": {"c-ip": "203.0.113.30"}, "events": ["admin-delete-link", "admin-finalize"]},
+    {"group": {"c-ip": "192.0.2.80"}, "events": ["straddle-delete", "straddle-finalize"]}
+  ]
+}

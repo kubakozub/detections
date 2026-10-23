@@ -1,0 +1,45 @@
+title: WordPress Media Finalize Request
+id: 29b8e2ab-b57d-47c3-a399-517f1d7c71bf
+name: wordpress_media_finalize_request
+status: experimental
+description: |
+    A successful POST to the WordPress REST route /wp/v2/media/<id>/finalize, which client-side media
+    processing calls once per upload to store the sub-sizes the browser generated. Until the fix -
+    Gutenberg 23.8, and core r63200 before WordPress 7.1 shipped - the route wrote the sub-size file
+    names it was sent into attachment metadata without checking that an upload had produced them,
+    which HackerOne #3931777 and #3931771 turned into file deletion and stored XSS. On its own this
+    is ordinary editor traffic; the rule exists as the first half of the finalize-then-delete
+    correlation.
+references:
+    - https://hackerone.com/reports/3931777
+    - https://hackerone.com/reports/3931771
+    - https://core.trac.wordpress.org/changeset/63200
+    - https://jakubkozub.com/research/wordpress-media-finalize/
+author: Jakub Kozub
+date: 2026-10-23
+tags:
+    - attack.initial-access
+    - attack.t1190
+logsource:
+    category: webserver
+detection:
+    selection_method:
+        cs-method: 'POST'
+        sc-status: 200
+    selection_route_pretty:
+        cs-uri-stem|contains: '/wp/v2/media/'
+        cs-uri-stem|endswith:
+            - '/finalize'
+            - '/finalize/'
+    selection_route_plain:
+        cs-uri-query|contains:
+            - 'rest_route=/wp/v2/media/'
+            - 'rest_route=%2Fwp%2Fv2%2Fmedia%2F'
+    selection_route_plain_finalize:
+        cs-uri-query|contains:
+            - '/finalize'
+            - '%2Ffinalize'
+    condition: selection_method and (selection_route_pretty or (selection_route_plain and selection_route_plain_finalize))
+falsepositives:
+    - Every image uploaded through the block editor on WordPress 7.1 or later, or with Gutenberg 23.x active, ends with one finalize call. The rule is informational and meant to feed the correlation.
+level: informational

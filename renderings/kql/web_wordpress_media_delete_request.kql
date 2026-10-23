@@ -1,0 +1,2 @@
+AppServiceHTTPLogs
+| where ((CsMethod =~ "DELETE" or (CsMethod =~ "POST" and CsUriQuery contains "_method=DELETE")) and (CsUriStem contains "/wp/v2/media/" or (CsUriQuery contains "rest_route=/wp/v2/media/" or CsUriQuery contains "rest_route=%2Fwp%2Fv2%2Fmedia%2F")) and ScStatus == 200) or (((CsUriStem endswith "/wp-admin/post.php" or CsUriStem endswith "/wp-admin/upload.php") and CsUriQuery contains "action=delete") and ScStatus == 302)

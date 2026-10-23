@@ -1,0 +1,15 @@
+name: Web server fields as Splunk extracts them from access_combined
+priority: 20
+transformations:
+  - id: access_combined_fields
+    type: field_name_mapping
+    mapping:
+      c-ip: clientip
+      cs-username: user
+      cs-method: method
+      cs-uri-stem: uri_path
+      cs-uri-query: uri_query
+      sc-status: status
+    rule_conditions:
+      - type: logsource
+        category: webserver

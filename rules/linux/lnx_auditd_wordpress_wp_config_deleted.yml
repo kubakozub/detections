@@ -1,0 +1,30 @@
+title: WordPress wp-config.php Deleted - Auditd
+id: 6906ab5e-959f-479f-af3f-a8c03f8b2cca
+status: experimental
+description: |
+    The auditd form of the wp-config.php delete rule, for hosts that keep auditd rather than an EDR or
+    Sysmon for Linux. The PATH record of an unlink carries nametype=DELETE and the path as the process
+    passed it, so a traversal such as uploads/2026/10/../../../../wp-config.php still ends in
+    /wp-config.php. Needs a watch on the file, for example
+    -w /var/www/html/wp-config.php -p wa -k wp_config. auditd hex-encodes a path that contains a
+    space, so a file in such a directory has to be matched on the decoded value.
+references:
+    - https://hackerone.com/reports/3931777
+    - https://jakubkozub.com/research/wordpress-media-finalize/#detection
+author: Jakub Kozub
+date: 2026-10-23
+tags:
+    - attack.impact
+    - attack.t1485
+logsource:
+    product: linux
+    service: auditd
+detection:
+    selection:
+        type: 'PATH'
+        nametype: 'DELETE'
+        name|endswith: '/wp-config.php'
+    condition: selection
+falsepositives:
+    - Deployment or restore tooling that deletes the file and writes a new one, rather than overwriting it in place.
+level: high

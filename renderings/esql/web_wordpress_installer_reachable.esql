@@ -1,0 +1,1 @@
+from * metadata _id, _index, _version | where ends_with(url.path, "/wp-admin/setup-config.php") and http.response.status_code==200

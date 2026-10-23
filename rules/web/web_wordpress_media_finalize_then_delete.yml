@@ -1,0 +1,30 @@
+title: WordPress Media Finalize And Media Delete From One Client
+id: d2602be3-00f5-43dc-a61e-5e7f6ba9df25
+status: experimental
+description: |
+    The access-log half of HackerOne #3931777. The chain needs one client to finalize an upload, which
+    plants a file name in attachment metadata, and then to delete media, which hands that name to
+    wp_delete_attachment_files(). Every request in between is authenticated, authorised and
+    successful, and the planted name travels in a JSON body that access logs do not keep, so the
+    sequence is the only thing the request lines show. Both requests carry the attachment id, so where
+    the log pipeline extracts it, add it to group-by and the rule becomes a per-attachment join. This
+    is a hunt rather than a page - triage is one question: did anything outside wp-content/uploads
+    disappear at that time? The host-side rules answer it.
+references:
+    - https://hackerone.com/reports/3931777
+    - https://core.trac.wordpress.org/changeset/63200
+    - https://jakubkozub.com/research/wordpress-media-finalize/#detection
+author: Jakub Kozub
+date: 2026-10-23
+correlation:
+    type: temporal
+    rules:
+        - wordpress_media_finalize_request
+        - wordpress_media_delete_request
+    group-by:
+        - c-ip
+    timespan: 15m
+falsepositives:
+    - An editor who uploads an image and deletes media within the window.
+    - Clients behind one NAT or reverse proxy share an address - group by the forwarded client address where the log records it.
+level: medium

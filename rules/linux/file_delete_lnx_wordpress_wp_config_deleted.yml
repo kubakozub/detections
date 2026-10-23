@@ -1,0 +1,27 @@
+title: WordPress wp-config.php Deleted
+id: 025e3c17-6e2c-4b71-8d1e-7359ee69359f
+status: experimental
+description: |
+    wp-config.php deleted on a Linux host. It holds the database credentials and the authentication
+    keys, and a site without it serves the installer to anyone who asks, so a delete is either a
+    deployment step or the start of a takeover. This is the outcome signal of HackerOne #3931777,
+    where the PHP worker unlinked it on behalf of an Author, and the cheapest file-integrity check a
+    WordPress host can run.
+references:
+    - https://hackerone.com/reports/3931777
+    - https://jakubkozub.com/research/wordpress-media-finalize/#detection
+author: Jakub Kozub
+date: 2026-10-23
+tags:
+    - attack.impact
+    - attack.t1485
+logsource:
+    product: linux
+    category: file_delete
+detection:
+    selection:
+        TargetFilename|endswith: '/wp-config.php'
+    condition: selection
+falsepositives:
+    - Deployment or restore tooling that deletes the file and writes a new one, rather than overwriting it in place.
+level: high

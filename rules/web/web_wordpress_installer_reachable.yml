@@ -1,0 +1,28 @@
+title: WordPress Installer Served On A Configured Site
+id: bccdf5fc-5cf9-4aa2-8853-b32d22b58eda
+status: experimental
+description: |
+    /wp-admin/setup-config.php refuses with HTTP 409 while wp-config.php exists. Once the file is gone,
+    every page answers 302 to the installer and the installer answers 200 - and whoever submits step 2
+    first points the site at their own database. An access log does not record where a redirect
+    points, but it records that 200, and a configured site has no baseline for it. This is the
+    aftermath signal of HackerOne #3931777 and holds for any bug that ends with wp-config.php missing.
+    Checked on WordPress 7.0.3 - 409 with the file in place, 302 and 200 with it removed.
+references:
+    - https://hackerone.com/reports/3931777
+    - https://jakubkozub.com/research/wordpress-media-finalize/#detection
+author: Jakub Kozub
+date: 2026-10-23
+tags:
+    - attack.initial-access
+    - attack.t1190
+logsource:
+    category: webserver
+detection:
+    selection:
+        cs-uri-stem|endswith: '/wp-admin/setup-config.php'
+        sc-status: 200
+    condition: selection
+falsepositives:
+    - A new installation, for the minutes it takes to set it up.
+level: high

@@ -1,0 +1,2 @@
+AppServiceHTTPLogs
+| where (CsMethod =~ "POST" and ScStatus == 200) and ((CsUriStem contains "/wp/v2/media/" and (CsUriStem endswith "/finalize" or CsUriStem endswith "/finalize/")) or ((CsUriQuery contains "rest_route=/wp/v2/media/" or CsUriQuery contains "rest_route=%2Fwp%2Fv2%2Fmedia%2F") and (CsUriQuery contains "/finalize" or CsUriQuery contains "%2Ffinalize")))

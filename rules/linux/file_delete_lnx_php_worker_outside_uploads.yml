@@ -1,0 +1,51 @@
+title: PHP Worker Deletes A File Outside The WordPress Uploads Tree
+id: 054c3a42-e785-40c5-ac58-a7b6da1dd9d5
+status: experimental
+description: |
+    The process serving PHP deletes a file that is not a temporary file, a session, a cache entry or
+    an upload. wp_delete_attachment_files() is meant to confine every delete to one attachment's
+    directory under wp-content/uploads; HackerOne #3931777 was a branch that did not. Once uploads,
+    temp files, sessions, page caches and update staging are excluded, what legitimately remains is
+    core, plugin and theme updates and plugin removal - known paths, in windows you can suppress.
+    Scope it to the hosts that serve WordPress.
+references:
+    - https://hackerone.com/reports/3931777
+    - https://jakubkozub.com/research/wordpress-media-finalize/#detection
+author: Jakub Kozub
+date: 2026-10-23
+tags:
+    - attack.impact
+    - attack.t1485
+logsource:
+    product: linux
+    category: file_delete
+detection:
+    selection_php_fpm:
+        Image|contains: '/php-fpm'
+    selection_php_embedded:
+        Image|endswith:
+            - '/apache2'
+            - '/httpd'
+            - '/lsphp'
+            - '/frankenphp'
+    filter_main_uploads:
+        TargetFilename|contains: '/wp-content/uploads/'
+    filter_main_temp:
+        TargetFilename|startswith:
+            - '/tmp/'
+            - '/var/tmp/'
+            - '/dev/shm/'
+            - '/run/'
+    filter_main_sessions:
+        TargetFilename|contains: '/sessions/sess_'
+    filter_optional_cache:
+        TargetFilename|contains: '/wp-content/cache/'
+    filter_optional_update_staging:
+        TargetFilename|contains:
+            - '/wp-content/upgrade/'
+            - '/wp-content/upgrade-temp-backup/'
+    condition: 1 of selection_php_* and not 1 of filter_main_* and not 1 of filter_optional_*
+falsepositives:
+    - Core, plugin and theme updates and plugin removal through the dashboard. Suppress during maintenance windows or exclude the plugin and theme directories while an update runs.
+    - Plugins that keep their own state files outside wp-content/uploads and wp-content/cache, such as security plugins writing logs.
+level: low

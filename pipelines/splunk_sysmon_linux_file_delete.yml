@@ -1,0 +1,13 @@
+name: Keep only Sysmon for Linux file-delete events in Splunk
+priority: 30
+transformations:
+  - id: sysmon_linux_file_delete_events
+    type: add_condition
+    conditions:
+      EventID:
+        - 23
+        - 26
+    rule_conditions:
+      - type: logsource
+        category: file_delete
+        product: linux
