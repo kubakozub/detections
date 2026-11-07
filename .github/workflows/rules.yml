@@ -1,0 +1,45 @@
+name: rules
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install the pinned backends
+        run: pip install -r requirements.txt
+
+      # Every rule has to be valid Sigma before anything else is worth running.
+      - name: sigma check
+        run: sigma check --fail-on-issues rules
+
+      # Each rule is converted by pySigma's SQLite backend and the SQL is run over
+      # the fixture events, so a rule is tested the way a user would convert it.
+      - name: Fixture tests
+        run: python -m unittest discover -s tests -v
+
+      # The committed queries under renderings/ are what a reader copies into
+      # Splunk, Elasticsearch or Sentinel. Regenerating them has to be a no-op:
+      # if it is not, a rule changed and the documented query no longer matches it.
+      - name: Renderings are in step with the rules
+        run: |
+          python scripts/render.py
+          if ! git diff --quiet -- renderings; then
+            echo "::error::renderings/ is stale. Run 'python scripts/render.py' and commit the result."
+            git --no-pager diff --stat -- renderings
+            git --no-pager diff -- renderings
+            exit 1
+          fi
+          echo "renderings match the rules"

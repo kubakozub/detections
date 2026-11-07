@@ -1,5 +1,7 @@
 # detections
 
+[![rules](https://github.com/kubakozub/detections/actions/workflows/rules.yml/badge.svg)](https://github.com/kubakozub/detections/actions/workflows/rules.yml)
+
 Sigma rules for what my WordPress finding leaves in the logs, with the log lines that
 should and should not fire them, and the same rules rendered for Splunk, Elasticsearch
 and Microsoft Sentinel / Defender.
@@ -97,6 +99,21 @@ Every rendering was run against the same fixtures on the real engine: Elasticsea
 - `file_delete_lnx_php_worker_outside_uploads` is a hunt: core, plugin and theme updates
   and plugin removal delete files too. Suppress your maintenance windows, and exclude
   directories where your plugins keep state.
+
+## Finding it in the first place
+
+These rules are the defensive half of one finding. The offensive half, the tooling that
+looks for the same class of bug in WordPress plugins before anyone reports it, is in two
+other repositories:
+
+- [wp-hook-guard](https://github.com/kubakozub/wp-hook-guard) answers which entry points
+  exist in a plugin and which of them are reachable and undefended.
+- [wp-authz-audit](https://github.com/kubakozub/wp-authz-audit) ranks those findings by
+  the privilege actually required, and diffs two releases of a plugin to report only what
+  became newly reachable or newly weaker.
+
+The write-up of the finding itself, with the exploit session replayed, is at
+[jakubkozub.com/research/wordpress-media-finalize](https://jakubkozub.com/research/wordpress-media-finalize/).
 
 ## License
 
